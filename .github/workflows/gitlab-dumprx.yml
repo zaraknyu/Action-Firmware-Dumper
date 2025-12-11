@@ -30,20 +30,23 @@ jobs:
     - name: Setup Dump Environment
       run: |
         mkdir -p workspace && cd workspace
-        git clone --depth=1 https://github.com/DumprX/DumprX.git ./dumprx
-        cd dumprx && bash setup.sh
+        python3 -m venv ubn  
+        source ubn/bin/activate
+        pip3 install dumpyara
 
     - name: Dump Firmware
       run: |
-        cd workspace/dumprx
-        bash dumper.sh ${{ github.event.inputs.FIRMWARE_LINK }}
+        cd workspace
+        sudo apt install aria2
+        aria2c -x 16 -s 16 -o firmware.tgz "${{ github.event.inputs.FIRMWARE_LINK }}"
+        python3 -m dumpyara firmware.tgz
         cd out
         echo "MANUFACTURER_NAME=$(grep "ro.product.vendor.manufacturer" vendor/build.prop | awk -F "=" '{split($2, words, " "); print words[1]; exit}')" >> $GITHUB_ENV
 
     - name: Set Variables - if oplus
       if: env.MANUFACTURER_NAME == 'oplus'
       run: |
-        cd workspace/dumprx/out
+        cd workspace/out
         rm -rf .git
         if [ -d odm ]; then
            echo "ODM directory exist..."
@@ -59,7 +62,7 @@ jobs:
     - name: Set Variables - if others
       if: env.MANUFACTURER_NAME != 'oplus'
       run: |
-        cd workspace/dumprx/out
+        cd workspace/out
         rm -rf .git
         echo "VENDOR_NAME=$(grep "ro.product.vendor.device" vendor/build.prop | awk -F "=" '{split($2, words, " "); print words[1]; exit}')" >> $GITHUB_ENV
         echo "BRANCH=$(grep "ro.vendor.build.id" vendor/build.prop | awk -F "=" '{split($2, words, " "); print words[1]; exit}')" >> $GITHUB_ENV
@@ -73,7 +76,7 @@ jobs:
 
     - name: Push as Repository
       run: |
-        cd workspace/dumprx/out
+        cd workspace/out
         rm -rf .git
         rm -rf .gitignore
         rm -rf .gitattributes
@@ -82,8 +85,8 @@ jobs:
         git lfs install
         find . \( -name "*sensetime*" -o -name "*.lic" \) | cut -d'/' -f'2-' >| .gitignore
         git branch -M ${{ env.BRANCH }}
-        git config --global user.name "Carlo Dandan"
-        git config --global user.email "carlodandan.personal@proton.me"
+        git config --global user.name "zaraknyu"
+        git config --global user.email "zarakinyu@outlook.in"
         git remote add origin https://${{ secrets.GITLAB_TOKEN_NAME }}:${{ secrets.GITLAB_TOKEN }}@gitlab.com/${{ env.USERNAME }}/android_dump_${{ env.MANUFACTURER_NAME }}_${{ env.VENDOR_NAME }}.git
         find . -type f -size +100M -exec git lfs track {} \;
         if [ -f .gitattributes ]; then
