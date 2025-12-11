@@ -33,7 +33,7 @@ jobs:
         python3 -m venv ubn  
         source ubn/bin/activate
         pip3 install dumpyara
-        sudo apt install aria2 erofs-utils
+        sudo apt install aria2 erofs-utils android-sdk-libsparse-utils
         aria2c -x 16 -s 16 -o firmware.tgz "${{ github.event.inputs.FIRMWARE_LINK }}"
         python3 -m dumpyara firmware.tgz
         cd out
