@@ -36,7 +36,7 @@ jobs:
         sudo apt install aria2 erofs-utils android-sdk-libsparse-utils
         aria2c -x 16 -s 16 -o firmware.tgz "${{ github.event.inputs.FIRMWARE_LINK }}"
         python3 -m dumpyara firmware.tgz
-        cd workspace/out
+        cd firmware
         echo "MANUFACTURER_NAME=$(grep "ro.product.vendor.manufacturer" vendor/build.prop | awk -F "=" '{split($2, words, " "); print words[1]; exit}')" >> $GITHUB_ENV
 
     - name: Set Variables - if oplus
