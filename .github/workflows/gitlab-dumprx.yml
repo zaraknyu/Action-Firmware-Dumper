@@ -84,7 +84,7 @@ jobs:
         git branch -M ${{ env.BRANCH }}
         git config --global user.name "Carlo Dandan"
         git config --global user.email "carlodandan.personal@proton.me"
-        git remote add origin https://${{ secrets.GITLAB_TOKEN_NAME }}:${{ secrets.GITLAB_TOKEN }}@gitlab.com/${{ env.USERNAME }}/android_dump_${{ env.MANUFACTURER_NAME }}_${{ env.VENDOR_NAME }}.git
+        git remote add origin https://${{ secrets.GITLAB_TOKEN_NAME }}:${{ secrets.GITLAB_TOKEN }}@gitlab.com/${{ env.USERNAME }}/android_dump_${{ env.MANUFACTURER_NAME }}_${{ env.VENDOR_NAME }}-aosp.git
         find . -type f -size +100M -exec git lfs track {} \;
         if [ -f .gitattributes ]; then
             git add .gitattributes
